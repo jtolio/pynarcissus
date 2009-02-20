@@ -1,0 +1,23 @@
+PyNarcissus is currently just a Javascript parser, and not a very Pythonic one
+at that. Furthermore, documentation is poor.
+
+As of 2009-02-19, PyNarcissus has been engineered such that
+
+str(parse("javascript code"))
+
+in Python is identical to
+
+parse("javascript code").toString()
+
+in Javascript. It was this feature that allowed for robust testing of the
+parser in the absence of a Javascript evaluator, as the output of the Python
+version was compared to the output of the Javascript version over all of the
+Spidermonkey Javascript tests.
+
+There are a few differences in output, as Python handles both floating point
+precision and non-ascii characters slightly differently.
+
+It is expected that future versions of PyNarcissus will be more Pythonic in many
+ways, and will break this string-conversion compatibility with the Javascript
+Narcissus.
+
