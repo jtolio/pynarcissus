@@ -46,7 +46,7 @@
 __author__ = "JT Olds"
 __author_email__ = "jtolds@xnet5.com"
 __date__ = "2009-02-19"
-__all__ = ["ParseError", "parse"]
+__all__ = ["ParseError", "parse", "tokens"]
 
 import re, sys, types
 
@@ -305,7 +305,8 @@ class Tokenizer(object):
                 match = reRegExp.match(input__)
                 if match:
                     token.type_ = REGEXP
-                    token.value = (match.group(1), match.group(2))
+                    token.value = {"regexp": match.group(1),
+                                   "modifiers": match.group(2)}
                     return match.group(0)
 
             match = opRegExp.match(input__)
@@ -392,10 +393,11 @@ class Node(list):
 
     # Always use push to add operands to an expression, to update start and end.
     def append(self, kid, numbers=[]):
-        if hasattr(self, "start") and kid.start < self.start:
-            self.start = kid.start
-        if hasattr(self, "end") and self.end < kid.end:
-            self.end = kid.end
+        if kid:
+            if hasattr(self, "start") and kid.start < self.start:
+                self.start = kid.start
+            if hasattr(self, "end") and self.end < kid.end:
+                self.end = kid.end
         return list.append(self, kid)
 
     indentLevel = 0
@@ -408,7 +410,7 @@ class Node(list):
                 a.append((attr, "[object Object]"))
             elif attr in ("append", "count", "extend", "getSource", "index",
                     "insert", "pop", "remove", "reverse", "sort", "type_",
-                    "target", "filename", "indentLevel"):
+                    "target", "filename", "indentLevel", "type"):
                 continue
             else:
                 a.append((attr, getattr(self, attr)))
@@ -421,7 +423,7 @@ class Node(list):
         for i, value in a:
             s += ",\n%s%s: " % ((INDENTATION * n), i)
             if i == "value" and self.type_ == REGEXP:
-                s += "/%s/%s" % value
+                s += "/%s/%s" % (value["regexp"], value["modifiers"])
             elif value is None:
                 s += "null"
             elif value is False:
@@ -439,7 +441,7 @@ class Node(list):
     __repr__ = __str__
 
     def getSource(self):
-        return self.tokenizer.source[self.start, self.end]
+        return self.tokenizer.source[self.start:self.end]
 
     filename = property(lambda self: self.tokenizer.filename)
 
@@ -1133,3 +1135,6 @@ def parse(source, filename=None, starting_line_number=1):
     if not t.done:
         raise t.newSyntaxError("Syntax error")
     return n
+
+if __name__ == "__main__":
+    print str(parse(file(sys.argv[1]).read(),sys.argv[1]))
