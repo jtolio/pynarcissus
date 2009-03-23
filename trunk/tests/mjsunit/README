@@ -1,0 +1,7 @@
+These tests came from the V8 javascript engine codebase. They have been
+ever-so-slightly modified, as a few of them were originally using %-symbols as
+parts of function names, and object getters and setters, which PyNarcissus is
+not supporting.
+
+The point of these tests is to simply compare the parse tree output of the
+original Narcissus with that of PyNarcissus.
