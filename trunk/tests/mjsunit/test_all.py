@@ -1,8 +1,6 @@
 #!/usr/bin/python2.5
 
 import sys, os, subprocess
-sys.path.append(os.path.join(os.pardir, os.pardir))
-import jsparser as js
 
 def main(argv):
     try:
