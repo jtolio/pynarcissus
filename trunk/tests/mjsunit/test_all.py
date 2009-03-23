@@ -14,21 +14,26 @@ def main(argv):
                                            if x[-3:] == ".js"]
     for testfile in testfiles:
         failed = False
+
         py_proc = subprocess.Popen(["./parse_mjsunit.py", testfile],
                 stdout=subprocess.PIPE)
+        js_proc = subprocess.Popen(["./parse_mjsunit.js", testfile],
+                stdout=subprocess.PIPE)
+
         py_parse_tree = py_proc.communicate()[0]
         if py_proc.returncode != 0:
             print "Python parsing failed for %s" % testfile
             failed = True
-        js_proc = subprocess.Popen(["./parse_mjsunit.js", testfile],
-                stdout=subprocess.PIPE)
+
         js_parse_tree = js_proc.communicate()[0]
         if js_proc.returncode != 0:
             print "Javascript parsing failed for %s" % testfile
             failed = True
+
         if failed:
             failures += 1
             continue
+
         if js_parse_tree != py_parse_tree:
             print "Parse tree mismatch for %s" % testfile
             file("/tmp/js-parse-tree-%d.out" % os.getpid(), 'w').write(
