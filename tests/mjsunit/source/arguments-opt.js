@@ -28,15 +28,15 @@
 // Flags: --allow-natives-syntax
 
 function L0() {
-  return %_ArgumentsLength();
+  return _ArgumentsLength();
 }
 
 function L1(a) {
-  return %_ArgumentsLength();
+  return _ArgumentsLength();
 }
 
 function L5(a,b,c,d,e) {
-  return %_ArgumentsLength();
+  return _ArgumentsLength();
 }
 
 
@@ -57,7 +57,7 @@ assertEquals(5, L5(1,2,3,4,5));
 
 
 function A(key) {
-  return %_Arguments(key);
+  return _Arguments(key);
 }
 
 // Integer access.

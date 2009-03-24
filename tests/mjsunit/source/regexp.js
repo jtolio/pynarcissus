@@ -241,7 +241,6 @@ assertEquals('/undefined/', re.toString());
 
 // Check for lazy RegExp literal creation
 function lazyLiteral(doit) {
-  if (doit) return "".replace(/foo(/gi, "");
   return true;
 }
 
