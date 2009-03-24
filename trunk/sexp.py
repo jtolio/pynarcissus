@@ -16,6 +16,7 @@ class UnknownNode(Error_): pass
 class OtherError(Error_): pass
 class ProgrammerError(OtherError): pass
 
+import sys
 import jsparser as js
 
 def o(n, i, c, handledattrs=[]):
@@ -240,7 +241,7 @@ def o(n, i, c, handledattrs=[]):
 
         elif n.type == "SCRIPT":
             check(attrs=["funDecls","varDecls"], subnodes=len(n))
-#            print "WARNING: skipping funDecls and varDecls"
+#            sys.stderr.write("WARNING: skipping funDecls and varDecls\n")
             return ("(script%s\n  " % props() + i +
                     ("\n  "+i).join((o(x,i+"  ",c) for x in n)) + ")")
 
@@ -281,8 +282,8 @@ def o(n, i, c, handledattrs=[]):
 
         elif n.type == "WITH":
             check(attrs=["body", "object"])
-            print "WARNING: A bad person wrote the code being parsed. Don't " \
-                    "use 'with'!"
+            sys.stderr.write("WARNING: A bad person wrote the code being "
+                    "parsed. Don't use 'with'!\n")
             return "(with%s %s %s)" % (props(), o(n.object,i,c), o(n.body,i,c))
 
         elif n.type == "WHILE":
@@ -333,7 +334,6 @@ def convert(parsetree, include_props=False):
     return o(parsetree, "", {"include_props": include_props}) + "\n"
 
 if __name__ == "__main__":
-    import sys
     try:
         include_props = (sys.argv[1] == "--props")
     except:
