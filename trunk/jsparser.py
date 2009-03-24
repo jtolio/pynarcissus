@@ -441,7 +441,13 @@ class Node(list):
     __repr__ = __str__
 
     def getSource(self):
-        return self.tokenizer.source[self.start:self.end]
+        if getattr(self, "start", None) is not None:
+            if getattr(self, "end", None) is not None:
+                return self.tokenizer.source[self.start:self.end]
+            return self.tokenizer.source[self.start:]
+        if getattr(self, "end", None) is not None:
+            return self.tokenizer.source[:self.end]
+        return self.tokenizer.source[:]
 
     filename = property(lambda self: self.tokenizer.filename)
 
