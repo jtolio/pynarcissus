@@ -133,7 +133,7 @@ var currentlyUncallable = {
 };
 
 function testNatives() {
-  var allNatives = %ListNatives();
+  var allNatives = ListNatives();
   for (var i = 0; i < allNatives.length; i++) {
     var nativeInfo = allNatives[i];
     var name = nativeInfo[0];

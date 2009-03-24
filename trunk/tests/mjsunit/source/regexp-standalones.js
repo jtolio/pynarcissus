@@ -67,12 +67,3 @@ result = string.match(pattern);
 assertEquals(1, result.length, "13");
 assertEquals('\u00BF\u00CD', result[0], "14");
 
-string = '\u4e00\uac00\u4e03\u4e00';
-result = string.match(pattern);
-assertEquals(1, result.length, "15");
-assertEquals(string, result[0], "16");
-
-string = '\u4e00\uac00 \u4e03\u4e00';
-result = string.match(pattern);
-assertEquals(1, result.length, "17");
-assertEquals('\u4e00\uac00', result[0], "18");

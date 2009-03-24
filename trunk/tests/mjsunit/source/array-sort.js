@@ -79,9 +79,9 @@ function TestNumberSort() {
             for (var yo = -1; yo <= 1; yo++) {
               var x = xb * xf + xo;
               var y = yb * yf + yo;
-              if (!%_IsSmi(x)) continue;
-              if (!%_IsSmi(y)) continue;
-              var lex = %SmiLexicographicCompare(x, y);
+              if (!_IsSmi(x)) continue;
+              if (!_IsSmi(y)) continue;
+              var lex = SmiLexicographicCompare(x, y);
               if (lex < 0) lex = -1;
               if (lex > 0) lex = 1;
               assertEquals(lex, (x == y) ? 0 : ((x + "") < (y + "") ? -1 : 1), x + " < " + y);
