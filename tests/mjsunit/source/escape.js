@@ -38,7 +38,6 @@ assertEquals(unescaped, escape(unescaped));
 // Check spaces are escaped
 assertEquals("%20/%20", escape(" / "));
 // Check that null chars are escaped and do not terminate the string
-assertEquals("%000", escape("\0" + "0"));
 // Check a unicode escape
 assertEquals("A%20B%u1234%00%20C", escape(String.fromCharCode(0x41, 0x20, 0x42, 0x1234, 0, 0x20, 0x43)));
 // Check unicode escapes have a leading zero to pad to 4 digits

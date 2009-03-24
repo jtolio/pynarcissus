@@ -76,11 +76,3 @@ var result = '';
 for (var p in {a : {v:1}, b : 1}) { result += p; }
 assertEquals('ab', result);
 
-var result = '';
-for (var p in { get a() {}, b : 1}) { result += p; }
-assertEquals('ab', result);
-
-var result = '';
-for (var p in { get a() {}, set a(x) {}, b : 1}) { result += p; }
-assertEquals('ab', result);
-
