@@ -45,7 +45,7 @@
 
 __author__ = "JT Olds"
 __author_email__ = "jtolds@xnet5.com"
-__date__ = "2009-02-19"
+__date__ = "2009-03-24"
 __all__ = ["ParseError", "parse", "tokens"]
 
 import re, sys, types
