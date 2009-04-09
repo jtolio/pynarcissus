@@ -52,7 +52,7 @@ def o(n, i, c, handledattrs=[]):
 
         if n.type == "ARRAY_INIT":
             check(subnodes=len(n))
-            s = "(ARRAY_INIT%s" % props()
+            s = "(ARRAY-INIT%s" % props()
             for x in n:
                 if x is not None:
                     s += " " + o(x,i,c)
@@ -113,7 +113,8 @@ def o(n, i, c, handledattrs=[]):
         elif n.type in ("DELETE", "TYPEOF", "NEW", "UNARY_MINUS", "NOT",
                 "VOID", "BITWISE_NOT", "UNARY_PLUS"):
             check(subnodes=1)
-            return "(%s%s %s)" % (n.value.upper(), props(), o(n[0],i,c))
+            return "(%s%s %s)" % (n.type.replace('_', '-'), props(),
+                    o(n[0],i,c))
 
         elif n.type == "DO":
             check(attrs=["body", "condition", "isLoop"])
@@ -193,8 +194,8 @@ def o(n, i, c, handledattrs=[]):
         elif n.type in ("INCREMENT", "DECREMENT"):
             check(optattrs=["postfix"], subnodes=1)
             if getattr(n, "postfix", False):
-                return "(_%s%s %s)" % (n.value, props(), o(n[0], i, c))
-            return "(%s_%s %s)" % (n.value, props(), o(n[0], i, c))
+                return "(POST-%s%s %s)" % (n.type, props(), o(n[0], i, c))
+            return "(%s%s %s)" % (n.type, props(), o(n[0], i, c))
 
         elif n.type == "INDEX":
             check(subnodes=2)
@@ -209,6 +210,11 @@ def o(n, i, c, handledattrs=[]):
             check(subnodes=len(n))
             return ''.join((' ' + o(x, i, c) for x in n))
 
+        elif n.type == "NEW_WITH_ARGS":
+            check(subnodes=2)
+            return "(%s%s %s %s)" % (n.value.upper(), props(), o(n[0],i,c),
+                    o(n[1],i,c))
+
         elif n.type in ("NUMBER", "TRUE", "FALSE", "THIS", "NULL"):
             return str(n.value).upper()
 
@@ -217,15 +223,15 @@ def o(n, i, c, handledattrs=[]):
             if len(n) > 0:
                 return ("(OBJECT_INIT%s\n  " % props() + i +
                         ("\n  "+i).join(o(x,i+"  ",c) for x in n) + ")")
-            return "(OBJECT_INIT%s)" % props()
+            return "(OBJECT-INIT%s)" % props()
 
         elif n.type in ("PLUS", "LT", "EQ", "AND", "OR", "MINUS", "MUL", "LE",
                 "NE", "STRICT_EQ", "DIV", "GE", "INSTANCEOF", "IN", "GT",
-                "NEW_WITH_ARGS", "BITWISE_OR", "BITWISE_AND", "BITWISE_XOR",
-                "STRICT_NE", "LSH", "RSH", "URSH", "MOD"):
+                "BITWISE_OR", "BITWISE_AND", "BITWISE_XOR", "STRICT_NE", "LSH",
+                "RSH", "URSH", "MOD"):
             check(subnodes=2)
-            return "(%s%s %s %s)" % (n.value.upper(), props(), o(n[0],i,c),
-                    o(n[1],i,c))
+            return "(%s%s %s %s)" % (n.type.replace('_', '-'), props(),
+                    o(n[0],i,c), o(n[1],i,c))
 
         elif n.type == "PROPERTY_INIT":
             check(subnodes=2)
