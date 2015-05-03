@@ -1053,9 +1053,7 @@ def Expression(t, x, stop=None):
                     operators.append(Node(t, GROUP))
                     x.parenLevel += 1
                 else:
-                    while (operators and
-                            opPrecedence.get(operators[-1].type_) >
-                            opPrecedence[NEW]):
+                    while (operators and opPrecedence.get(operators[-1].type_) or 0) > opPrecedence[NEW]:
                         reduce_()
 
                     # Handle () now, to regularize the n-ary case for n > 0.
