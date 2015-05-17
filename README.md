@@ -7,7 +7,7 @@ Currently this is just a Javascript parser
 
 this is a fork of pynarcissus by jtolds : https://github.com/jtolds/pynarcissus
 
-forked for the sole purpose of printing the jtold's class structure in json
+forked for the sole purpose of printing jtold's class structure in json
 
 enjoy
 
