@@ -282,7 +282,15 @@ class Tokenizer(object):
                 token.value = float(match.group(0))
                 return match.group(0)
 
-            match = re.match(r'^0[xX][\da-fA-F]+|^0[0-7]*|^\d+', input__)
+            match = re.match(r'^0[0-7]+', input__)
+            if match:
+                token.type_ = NUMBER
+                # octal. 077 does not work in python 3 but 0o77 works in
+                # python 2 and 3
+                token.value = eval("0o" + match.group(0)[1:])
+                return match.group(0)
+
+            match = re.match(r'^0[xX][\da-fA-F]+|^\d+', input__)
             if match:
                 token.type_ = NUMBER
                 token.value = eval(match.group(0))
@@ -890,7 +898,7 @@ def Expression(t, x, stop=None):
                 if t.scanOperand:
                     raise BreakOutOfLoops
                 while ((operators and opPrecedence.get(operators[-1].type_,
-                        None) > opPrecedence.get(tt)) or (tt == COLON and
+                        -1) > opPrecedence.get(tt, -1)) or (tt == COLON and
                         operators and operators[-1].type_ == ASSIGN)):
                     reduce_()
                 if tt == COLON:
@@ -924,8 +932,8 @@ def Expression(t, x, stop=None):
                         raise BreakOutOfLoops
                 if t.scanOperand:
                     raise BreakOutOfLoops
-                while operators and opPrecedence.get(operators[-1].type_) and (
-                    opPrecedence.get(operators[-1].type_) >= opPrecedence.get(tt)
+                while operators and opPrecedence.get(operators[-1].type_, -1) and (
+                    opPrecedence.get(operators[-1].type_, -1) >= opPrecedence.get(tt, -1)
                     ): reduce_()
                 if tt == DOT:
                     t.mustMatch(IDENTIFIER)
@@ -952,7 +960,7 @@ def Expression(t, x, stop=None):
                     # Use >, not >=, so postfix has higher precedence than
                     # prefix.
                     while (operators and opPrecedence.get(operators[-1].type_,
-                            None) > opPrecedence.get(tt)):
+                            -1) > opPrecedence.get(tt, -1)):
                         reduce_()
                     n = Node(t, tt, [operands.pop()])
                     n.postfix = True
@@ -1054,7 +1062,7 @@ def Expression(t, x, stop=None):
                     x.parenLevel += 1
                 else:
                     while (operators and
-                            opPrecedence.get(operators[-1].type_) >
+                            opPrecedence.get(operators[-1].type, -1) >
                             opPrecedence[NEW]):
                         reduce_()
 
