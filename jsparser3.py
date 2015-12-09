@@ -50,6 +50,8 @@ __all__ = ["ParseError", "parse", "tokens"]
 
 import re, sys, types
 
+import json
+
 class Object: pass
 class Error_(Exception): pass
 class ParseError(Error_): pass
@@ -415,23 +417,57 @@ class Node(list):
         for attr in dir(self):
             if attr[0] == "_": continue
             elif attr == "tokenizer":
-                a.append((attr, "[object Object]"))
+                toke=getattr(self,attr)
+                tokenize={}
+                for vp in vars(toke):
+                  if str(vp) == "tokens":
+                    tokeout={}
+                    tokend=vars(toke)[vp]
+                    for ti in tokend:
+                      tokedwn=vars(tokend[ti])
+                      tokeout[str(ti)]={}
+                      for tdi in tokedwn:
+                        if str(tdi) == "type_":
+                          toketype=tokenstr(tokedwn["type_"])
+                          tokeout[str(ti)]["type"]=toketype
+                        elif str(tdi) in ("assignOp"):
+                          continue
+                        else:
+                          tokeout[str(ti)][str(tdi)]=tokedwn[tdi]
+                    tokenize["tokens"]=tokeout
+                  elif str(vp) in ("source", "filename", "lookahead", "scanOperand", "scanNewlines"):
+                    continue
+                  else:
+                    #interested in :: tokenIndex,cursor,lineno,tokens,tokenIndex
+                    tokenize[str(vp)]=vars(toke)[vp]
+                a.append((attr,tokenize))
             elif attr in ("append", "count", "extend", "getSource", "index",
                     "insert", "pop", "remove", "reverse", "sort", "type_",
-                    "target", "filename", "indentLevel", "type"):
+                    "target", "filename", "indentLevel", "clear", "copy", "type"):
                 continue
             else:
                 a.append((attr, getattr(self, attr)))
         if len(self): a.append(("length", len(self)))
         a.sort(key=lambda item: item[0])
-        INDENTATION = "    "
+
+        INDENTATION = "  "
         Node.indentLevel += 1
         n = Node.indentLevel
-        s = "{\n%stype: %s" % ((INDENTATION * n), tokenstr(self.type_))
+        s = "{\n%s\"type\": \"%s\"" % ((INDENTATION * n), tokenstr(self.type_))
         for i, value in a:
-            s += ",\n%s%s: " % ((INDENTATION * n), i)
+            s += ",\n%s\"%s\": " % ((INDENTATION * n), i)
             if i == "value" and self.type_ == REGEXP:
                 s += "/%s/%s" % (value["regexp"], value["modifiers"])
+            elif i == "funDecls":
+                if str(value) == "[]":
+                  s += "null"
+                else:
+                  s += "["+str(value)+"]"
+            elif i == "varDecls":
+                if str(value) == "[]":
+                  s += "null"
+                else:
+                  s += "["+str(value)+"]"
             elif value is None:
                 s += "null"
             elif value is False:
@@ -439,7 +475,16 @@ class Node(list):
             elif value is True:
                 s += "true"
             elif type(value) == list:
-                s += ','.join((str(x) for x in value))
+                s += "["+str(','.join(('"'+str(x)+'"' for x in value)))+"]"
+            elif type(value) == dict:
+                s += json.dumps(value)
+            elif ( i == "value" or i == "name" ) and str(type(value)) != "<class '__main__.Node'>":
+                if type(value) != int and value[0] == "{" and len(value) > 1:
+                  s += str(value)
+                else:
+                  s += '"'+str(value)+'"'
+            elif i == "value" and str(type(i)) == "<class '__main__.Node'>":
+              s += str(value)
             else:
                 s += str(value)
         Node.indentLevel -= 1
